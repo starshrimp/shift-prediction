@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; // useState for dynamic values
 
 function PredictForm() {
   const [pio2, setPio2] = useState('');
   const [spo2, setSpo2] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState(false); // whether form has been submitted
 
   const handleSubmit = (e) => {
-    e.preventDefault(); // prevents page from reloading
+    e.preventDefault(); // prevents page from reloading (HTML default behavior)
     setSubmitted(true);
-  };
+  }; //e is event object -> created when submission occurs
 
-  return (
+  return ( //JSX syntax -> rendered UI
     <div>
       <form onSubmit={handleSubmit}>
         <label>
@@ -19,7 +19,7 @@ function PredictForm() {
             type="number"
             step="any"
             value={pio2}
-            onChange={(e) => setPio2(e.target.value)}
+            onChange={(e) => setPio2(e.target.value)} //e.target.value is input typed 
             required
           />
         </label>
@@ -39,7 +39,7 @@ function PredictForm() {
       </form>
       
 
-      {submitted && (
+      {submitted && ( // only shows if submitted
         <p>
           You entered PiO₂ = <strong>{pio2}</strong> kPa and SpO₂ = <strong>{spo2}</strong>%
         </p>
@@ -48,4 +48,4 @@ function PredictForm() {
   );
 }
 
-export default PredictForm;
+export default PredictForm; // makes it usable in other files
