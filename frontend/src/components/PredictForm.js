@@ -10,9 +10,11 @@ function PredictForm() {
   const handleSubmit = async (e) => { //async function to handle form submission
     e.preventDefault(); // prevents page from reloading (HTML default behavior)
     setSubmitted(true);
-    const payload = { // prepare data to send to backend
-      inputs: [parseFloat(pio2), parseFloat(spo2)] //parseFloat converts string to float
+    const payload = {
+      PiO2: pio2 !== '' ? parseFloat(pio2) : null,
+      SpO2: spo2 !== '' ? parseFloat(spo2) : null
     };
+
 
     try {
       const res = await fetch('http://127.0.0.1:5000/predict', { // await = wait for response from backend
@@ -25,10 +27,14 @@ function PredictForm() {
 
       const data = await res.json(); // response parsed as JSON
 
-      setPrediction(data.prediction);
+      if (data.error) {
+        setPrediction(`Server error: ${data.error}`);
+      } else {
+        setPrediction(`Predicted shift: ${data.prediction} (shift_raw = ${data.shift_raw}, log_PiO2 = ${data.log_PiO2})`);
+      }
     } catch (err) {
-      setPrediction(err.message); // if error, set prediction to error message
-    }   
+      setPrediction("Network or server error");
+    }
     }; //e is event object -> created when submission occurs
 
   return ( //JSX syntax -> rendered UI
@@ -65,6 +71,8 @@ function PredictForm() {
           You entered PiO₂ = <strong>{pio2}</strong> kPa and SpO₂ = <strong>{spo2}</strong>%
         </p>
       )}
+      {prediction && <p>{prediction}</p>}
+
       {prediction !== null && (
         <p>Predicted shift: <strong>{prediction}</strong></p>
       )}
