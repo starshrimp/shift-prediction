@@ -7,6 +7,7 @@ function PredictForm() {
   const [prediction, setPrediction] = useState(null);
   const [uncertainty, setUncertainty] = useState(null);
   const [error, setError] = useState(null); 
+  const [confidence, setConfidence] = useState(null); // state to hold confidence level
 
 
   const handleSubmit = async (e) => { //async function to handle form submission
@@ -38,6 +39,8 @@ function PredictForm() {
       } else {
         setPrediction(data.prediction);
         setUncertainty(data.uncertainty_sd);
+        setConfidence(data.confidence_level);
+
 
       }
     } catch (err) {
@@ -75,12 +78,7 @@ function PredictForm() {
       
     {error && <p style={{ color: "red" }}>Error: {error}</p>}
 
-    {prediction !== null && (
-      <p>
-        <strong>Predicted shift:</strong> {prediction}
-        {uncertainty !== null && <> ± {uncertainty}</>}
-      </p>
-    )}
+
 
       {submitted && ( // only shows if submitted
         <p>
@@ -90,7 +88,18 @@ function PredictForm() {
       {prediction && <p>{prediction}</p>}
 
       {prediction !== null && (
-        <p>Predicted shift: <strong>{prediction}</strong></p>
+          <p>
+            <strong>Predicted shift:</strong> {prediction}
+            {uncertainty !== null && <> ± {uncertainty}</>}
+          </p>
+        )}
+      {confidence && (
+        <p>
+          <strong>Confidence level:</strong>{' '}
+          {confidence === 'high' && <span style={{ color: 'green' }}>🟢 High</span>}
+          {confidence === 'moderate' && <span style={{ color: 'orange' }}>🟡 Moderate</span>}
+          {confidence === 'low' && <span style={{ color: 'red' }}>🔴 Low</span>}
+        </p>
       )}
 
     </div>
