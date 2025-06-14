@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 from scipy.interpolate import PchipInterpolator
 
-# Load the trained model
-model = joblib.load("models/model_1point.joblib")
+cv_model_paths = [f"models/1_point/model_1point_fold_{i}.joblib" for i in range(5)]
+cv_models = [joblib.load(p) for p in cv_model_paths]
 
 # Load ODC table
 odc = pd.read_csv("/Users/sarah/ML/master_thesis/ODC/Neonatal_ODC_Table.csv")
@@ -41,13 +41,18 @@ def predict():
 
         # Format features
         features = np.array([shift_raw, log_pio2, spo2]).reshape(1, -1)
-        prediction = model.predict(features)[0]
+        predictions = [model.predict(features)[0] for model in cv_models]
+        mean_pred = float(np.mean(predictions))
+        std_pred = float(np.std(predictions))
+
 
         return jsonify({
-            "prediction": round(float(prediction), 3),
-            "shift_raw": round(float(shift_raw), 3),
-            "log_PiO2": round(float(log_pio2), 3)
+            "prediction": round(mean_pred, 3),
+            "uncertainty_sd": round(std_pred, 3),
+            "shift_raw": round(shift_raw, 3),
+            "log_PiO2": round(log_pio2, 3)
         })
+
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500

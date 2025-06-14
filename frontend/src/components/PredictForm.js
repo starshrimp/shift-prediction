@@ -5,11 +5,17 @@ function PredictForm() {
   const [spo2, setSpo2] = useState('');
   const [submitted, setSubmitted] = useState(false); // whether form has been submitted
   const [prediction, setPrediction] = useState(null);
+  const [uncertainty, setUncertainty] = useState(null);
+  const [error, setError] = useState(null); 
 
 
   const handleSubmit = async (e) => { //async function to handle form submission
     e.preventDefault(); // prevents page from reloading (HTML default behavior)
     setSubmitted(true);
+    setPrediction(null);
+    setUncertainty(null);
+    setError(null);
+
     const payload = {
       PiO2: pio2 !== '' ? parseFloat(pio2) : null,
       SpO2: spo2 !== '' ? parseFloat(spo2) : null
@@ -30,7 +36,9 @@ function PredictForm() {
       if (data.error) {
         setPrediction(`Server error: ${data.error}`);
       } else {
-        setPrediction(`Predicted shift: ${data.prediction} (shift_raw = ${data.shift_raw}, log_PiO2 = ${data.log_PiO2})`);
+        setPrediction(data.prediction);
+        setUncertainty(data.uncertainty_sd);
+
       }
     } catch (err) {
       setPrediction("Network or server error");
@@ -65,6 +73,14 @@ function PredictForm() {
         <button type="submit">Submit</button>
       </form>
       
+    {error && <p style={{ color: "red" }}>Error: {error}</p>}
+
+    {prediction !== null && (
+      <p>
+        <strong>Predicted shift:</strong> {prediction}
+        {uncertainty !== null && <> ± {uncertainty}</>}
+      </p>
+    )}
 
       {submitted && ( // only shows if submitted
         <p>
@@ -82,3 +98,14 @@ function PredictForm() {
 }
 
 export default PredictForm; // makes it usable in other files
+
+
+// To quantify model confidence, we used the standard deviation across predictions from 5 cross-validation models. We stratified confidence levels based on empirical percentiles of these standard deviations on the validation set:
+
+// High confidence: SD < 0.03 (below median)
+
+// Moderate confidence: 0.03 ≤ SD < 0.07 (up to ~75th percentile)
+
+// Low confidence: SD ≥ 0.07 (above ~75–80th percentile)
+
+// These thresholds were chosen to reflect regions of consistent model predictions while preserving interpretability for clinical users.
