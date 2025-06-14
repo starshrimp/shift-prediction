@@ -1,0 +1,9 @@
+name: odc-flask
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - flask
+      - flask-cors
+      - joblib
+      - scikit-learn
