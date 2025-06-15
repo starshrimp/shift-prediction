@@ -2,12 +2,10 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import joblib
 import numpy as np
+import pandas as pd
+from scipy.interpolate import PchipInterpolator
+from predict.predict_1point import predict_shift
 
-# Load the trained model
-model = joblib.load("models/model_1point.joblib")
-
-# Define the features expected by the model
-MODEL_FEATURES = ['shift_raw', 'log_PiO2', 'SpO2(%)']
 
 app = Flask(__name__)
 CORS(app)
@@ -19,15 +17,16 @@ def ping():
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    data = request.get_json()
-    inputs = data.get("inputs", [])
+    try:
+        data = request.get_json()
+        spo2 = float(data.get("SpO2"))
+        pio2 = float(data.get("PiO2"))
 
-    if len(inputs) != 2:
-        return jsonify({"error": "Expected exactly 2 inputs"}), 400
+        result = predict_shift(spo2, pio2)
+        return jsonify(result)
 
-    # dummy prediction logic for now
-    dummy_shift = round(inputs[0] * 0.1 + inputs[1] * 0.01, 3)
-    return jsonify({"prediction": dummy_shift})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
