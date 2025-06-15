@@ -1,4 +1,5 @@
 import React, { useState } from 'react'; // useState for dynamic values
+import { Box, Container, Typography, TextField, Button, Paper , Alert, Divider } from '@mui/material';
 
 function PredictForm() {
   const [pio2, setPio2] = useState('');
@@ -49,60 +50,71 @@ function PredictForm() {
     }; //e is event object -> created when submission occurs
 
   return ( //JSX syntax -> rendered UI
-    <div>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Inspired O₂ (PiO₂ in kPa): 
-          <input
-            type="number"
-            step="any"
+    <Container maxWidth="sm" sx={{ mt: 4 }}>
+      <Paper elevation={3} sx={{ p: 3 }}>
+        <Typography variant="h5" gutterBottom>
+          ODC Shift Prediction
+        </Typography>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+        >
+          <TextField
+            label="Inspired O₂ (PiO₂ in kPa)"
             value={pio2}
-            onChange={(e) => setPio2(e.target.value)} //e.target.value is input typed 
-            required
-          />
-        </label>
-        <br />
-        <label>
-          SpO₂ (%): 
-          <input
+            onChange={(e) => setPio2(e.target.value)}
             type="number"
             step="any"
+            required
+            fullWidth
+          />
+          <TextField
+            label="SpO₂ (%)"
             value={spo2}
             onChange={(e) => setSpo2(e.target.value)}
+            type="number"
+            step="any"
             required
+            fullWidth
           />
-        </label>
-        <br />
-        <button type="submit">Submit</button>
-      </form>
-      
-    {error && <p style={{ color: "red" }}>Error: {error}</p>}
+          <Button type="submit" variant="contained" color="primary">
+            Submit
+          </Button>
+        </Box>
 
-
-
-      {submitted && ( // only shows if submitted
-        <p>
-          You entered PiO₂ = <strong>{pio2}</strong> kPa and SpO₂ = <strong>{spo2}</strong>%
-        </p>
-      )}
-      {prediction && <p>{prediction}</p>}
-
-      {prediction !== null && (
-          <p>
-            <strong>Predicted shift:</strong> {prediction}
-            {uncertainty !== null && <> ± {uncertainty}</>}
-          </p>
+        {error && (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            {error}
+          </Alert>
         )}
-      {confidence && (
-        <p>
-          <strong>Confidence level:</strong>{' '}
-          {confidence === 'high' && <span style={{ color: 'green' }}>🟢 High</span>}
-          {confidence === 'moderate' && <span style={{ color: 'orange' }}>🟡 Moderate</span>}
-          {confidence === 'low' && <span style={{ color: 'red' }}>🔴 Low</span>}
-        </p>
-      )}
 
-    </div>
+        {submitted && (
+          <Typography sx={{ mt: 2 }}>
+            You entered PiO₂ = <strong>{pio2}</strong> kPa and SpO₂ = <strong>{spo2}</strong>%
+          </Typography>
+        )}
+
+        {prediction !== null && (
+          <>
+            <Divider sx={{ my: 2 }} />
+            <Typography>
+              <strong>Predicted shift:</strong> {prediction}
+              {uncertainty !== null && <> ± {uncertainty}</>}
+            </Typography>
+          </>
+        )}
+
+        {confidence && (
+          <Typography sx={{ mt: 1 }}>
+            <strong>Confidence level:</strong>{' '}
+            {confidence === 'high' && <span style={{ color: 'green' }}>🟢 High</span>}
+            {confidence === 'moderate' && <span style={{ color: 'orange' }}>🟡 Moderate</span>}
+            {confidence === 'low' && <span style={{ color: 'red' }}>🔴 Low</span>}
+          </Typography>
+        )}
+      </Paper>
+    </Container>
   );
 }
 
