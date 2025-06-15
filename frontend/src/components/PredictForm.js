@@ -5,14 +5,23 @@ function PredictForm() {
   const [spo2, setSpo2] = useState('');
   const [submitted, setSubmitted] = useState(false); // whether form has been submitted
   const [prediction, setPrediction] = useState(null);
+  const [uncertainty, setUncertainty] = useState(null);
+  const [error, setError] = useState(null); 
+  const [confidence, setConfidence] = useState(null); // state to hold confidence level
 
 
   const handleSubmit = async (e) => { //async function to handle form submission
     e.preventDefault(); // prevents page from reloading (HTML default behavior)
     setSubmitted(true);
-    const payload = { // prepare data to send to backend
-      inputs: [parseFloat(pio2), parseFloat(spo2)] //parseFloat converts string to float
+    setPrediction(null);
+    setUncertainty(null);
+    setError(null);
+
+    const payload = {
+      PiO2: pio2 !== '' ? parseFloat(pio2) : null,
+      SpO2: spo2 !== '' ? parseFloat(spo2) : null
     };
+
 
     try {
       const res = await fetch('http://127.0.0.1:5000/predict', { // await = wait for response from backend
@@ -25,10 +34,18 @@ function PredictForm() {
 
       const data = await res.json(); // response parsed as JSON
 
-      setPrediction(data.prediction);
+      if (data.error) {
+        setPrediction(`Server error: ${data.error}`);
+      } else {
+        setPrediction(data.prediction);
+        setUncertainty(data.uncertainty_sd);
+        setConfidence(data.confidence_level);
+
+
+      }
     } catch (err) {
-      setPrediction(err.message); // if error, set prediction to error message
-    }   
+      setPrediction("Network or server error");
+    }
     }; //e is event object -> created when submission occurs
 
   return ( //JSX syntax -> rendered UI
@@ -59,14 +76,30 @@ function PredictForm() {
         <button type="submit">Submit</button>
       </form>
       
+    {error && <p style={{ color: "red" }}>Error: {error}</p>}
+
+
 
       {submitted && ( // only shows if submitted
         <p>
           You entered PiO₂ = <strong>{pio2}</strong> kPa and SpO₂ = <strong>{spo2}</strong>%
         </p>
       )}
+      {prediction && <p>{prediction}</p>}
+
       {prediction !== null && (
-        <p>Predicted shift: <strong>{prediction}</strong></p>
+          <p>
+            <strong>Predicted shift:</strong> {prediction}
+            {uncertainty !== null && <> ± {uncertainty}</>}
+          </p>
+        )}
+      {confidence && (
+        <p>
+          <strong>Confidence level:</strong>{' '}
+          {confidence === 'high' && <span style={{ color: 'green' }}>🟢 High</span>}
+          {confidence === 'moderate' && <span style={{ color: 'orange' }}>🟡 Moderate</span>}
+          {confidence === 'low' && <span style={{ color: 'red' }}>🔴 Low</span>}
+        </p>
       )}
 
     </div>
@@ -74,3 +107,14 @@ function PredictForm() {
 }
 
 export default PredictForm; // makes it usable in other files
+
+
+// To quantify model confidence, we used the standard deviation across predictions from 5 cross-validation models. We stratified confidence levels based on empirical percentiles of these standard deviations on the validation set:
+
+// High confidence: SD < 0.03 (below median)
+
+// Moderate confidence: 0.03 ≤ SD < 0.07 (up to ~75th percentile)
+
+// Low confidence: SD ≥ 0.07 (above ~75–80th percentile)
+
+// These thresholds were chosen to reflect regions of consistent model predictions while preserving interpretability for clinical users.
