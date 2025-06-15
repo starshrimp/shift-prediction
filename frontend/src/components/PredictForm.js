@@ -1,15 +1,29 @@
 import React, { useState } from 'react'; // useState for dynamic values
-import { Box, Container, Typography, TextField, Button, Paper , Alert, Divider } from '@mui/material';
+import { Box, Container, Typography, TextField, Button, IconButton, Paper , Alert, Divider , Grid} from '@mui/material';
+
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 function PredictForm() {
-  const [pio2, setPio2] = useState('');
-  const [spo2, setSpo2] = useState('');
+  const [datapoints, setDatapoints] = useState([{ pio2: '', spo2: '' }]);
   const [submitted, setSubmitted] = useState(false); // whether form has been submitted
   const [prediction, setPrediction] = useState(null);
   const [uncertainty, setUncertainty] = useState(null);
   const [error, setError] = useState(null); 
   const [confidence, setConfidence] = useState(null); // state to hold confidence level
 
+  const handleInputChange = (index, field, value) => {
+    const updated = [...datapoints];
+    updated[index][field] = value;
+    setDatapoints(updated);
+  };
+
+  const addDatapoint = () => {
+    setDatapoints([...datapoints, { pio2: '', spo2: '' }]);
+  };
+
+  const removeDatapoint = (indexToRemove) => {
+  setDatapoints((prev) => prev.filter((_, i) => i !== indexToRemove));
+};
 
   const handleSubmit = async (e) => { //async function to handle form submission
     e.preventDefault(); // prevents page from reloading (HTML default behavior)
@@ -18,9 +32,9 @@ function PredictForm() {
     setUncertainty(null);
     setError(null);
 
+
     const payload = {
-      PiO2: pio2 !== '' ? parseFloat(pio2) : null,
-      SpO2: spo2 !== '' ? parseFloat(spo2) : null
+      inputs: datapoints.map(dp => [parseFloat(dp.pio2), parseFloat(dp.spo2)])
     };
 
 
@@ -52,66 +66,75 @@ function PredictForm() {
   return ( //JSX syntax -> rendered UI
     <Container maxWidth="sm" sx={{ mt: 4 }}>
       <Paper elevation={3} sx={{ p: 3 }}>
-        <Typography variant="h5" gutterBottom>
-          ODC Shift Prediction
-        </Typography>
-        <Box
-          component="form"
-          onSubmit={handleSubmit}
-          sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
-        >
-          <TextField
-            label="Inspired O₂ (PiO₂ in kPa)"
-            value={pio2}
-            onChange={(e) => setPio2(e.target.value)}
-            type="number"
-            step="any"
-            required
-            fullWidth
-          />
-          <TextField
-            label="SpO₂ (%)"
-            value={spo2}
-            onChange={(e) => setSpo2(e.target.value)}
-            type="number"
-            step="any"
-            required
-            fullWidth
-          />
-          <Button type="submit" variant="contained" color="primary">
+        <Typography variant="h5" gutterBottom>ODC Shift Prediction</Typography>
+        <form onSubmit={handleSubmit}>
+          {datapoints.map((dp, index) => (
+            <Grid container spacing={2} key={index} alignItems="center" sx={{ mb: 1 }}>
+              <Grid item xs={5}>
+                <TextField
+                  label="Inspired O₂ (kPa)"
+                  type="number"
+                  value={dp.pio2}
+                  onChange={(e) => handleInputChange(index, 'pio2', e.target.value)}
+                  required
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={5}>
+                <TextField
+                  label="SpO₂ (%)"
+                  type="number"
+                  value={dp.spo2}
+                  onChange={(e) => handleInputChange(index, 'spo2', e.target.value)}
+                  required
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={2}>
+                {datapoints.length > 1 && index > 0 && (
+                  <Button
+                    color="error"
+                    onClick={() => removeDatapoint(index)}
+                    sx={{ minWidth: 0 }}
+                  >
+                    X
+                  </Button>
+                )}
+              </Grid>
+
+            </Grid>
+          ))}
+
+
+          <Box display="flex" justifyContent="center" mb={2}>
+            <IconButton color="primary" onClick={addDatapoint}>
+              <AddCircleOutlineIcon />
+            </IconButton>
+          </Box>
+
+          <Button type="submit" variant="contained" fullWidth>
             Submit
           </Button>
-        </Box>
+        </form>
 
-        {error && (
-          <Alert severity="error" sx={{ mt: 2 }}>
-            {error}
-          </Alert>
-        )}
-
-        {submitted && (
-          <Typography sx={{ mt: 2 }}>
-            You entered PiO₂ = <strong>{pio2}</strong> kPa and SpO₂ = <strong>{spo2}</strong>%
-          </Typography>
-        )}
+        {error && <Typography color="error" sx={{ mt: 2 }}>{error}</Typography>}
 
         {prediction !== null && (
           <>
             <Divider sx={{ my: 2 }} />
             <Typography>
               <strong>Predicted shift:</strong> {prediction}
-              {uncertainty !== null && <> ± {uncertainty}</>}
+              {uncertainty && <> ± {uncertainty}</>}
             </Typography>
+            {confidence && (
+              <Typography sx={{ mt: 1 }}>
+                <strong>Confidence level:</strong>{' '}
+                {confidence === 'high' && <span style={{ color: 'green' }}>🟢 High</span>}
+                {confidence === 'moderate' && <span style={{ color: 'orange' }}>🟡 Moderate</span>}
+                {confidence === 'low' && <span style={{ color: 'red' }}>🔴 Low</span>}
+              </Typography>
+            )}
           </>
-        )}
-
-        {confidence && (
-          <Typography sx={{ mt: 1 }}>
-            <strong>Confidence level:</strong>{' '}
-            {confidence === 'high' && <span style={{ color: 'green' }}>🟢 High</span>}
-            {confidence === 'moderate' && <span style={{ color: 'orange' }}>🟡 Moderate</span>}
-            {confidence === 'low' && <span style={{ color: 'red' }}>🔴 Low</span>}
-          </Typography>
         )}
       </Paper>
     </Container>
