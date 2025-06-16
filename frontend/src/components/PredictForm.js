@@ -31,6 +31,7 @@ function PredictForm() {
     setPrediction(null);
     setUncertainty(null);
     setError(null);
+    setConfidence(null);
 
 
     const payload = {
@@ -50,13 +51,17 @@ function PredictForm() {
       const data = await res.json(); // response parsed as JSON
 
       if (data.error) {
-        setPrediction(`Server error: ${data.error}`);
-      } else {
+        setError(`Server error: ${data.error}`);
+      } else if (Array.isArray(data.prediction)) {
         setPrediction(data.prediction);
-        setUncertainty(data.uncertainty_sd);
-        setConfidence(data.confidence_level);
-
-
+        setUncertainty(null); // optional: could compute mean or min/max SD here
+        setConfidence(null);  // optional: could infer aggregate confidence
+      } else if (typeof data.prediction === 'object') {
+        setPrediction([data.prediction]); // wrap single prediction into array
+        setUncertainty(data.prediction.uncertainty_sd ?? null);
+        setConfidence(data.prediction.confidence_level ?? null);
+      } else {
+        setError("Unexpected response format from backend.");
       }
     } catch (err) {
       setPrediction("Network or server error");
@@ -119,23 +124,28 @@ function PredictForm() {
 
         {error && <Typography color="error" sx={{ mt: 2 }}>{error}</Typography>}
 
-        {prediction !== null && (
+       {Array.isArray(prediction) && prediction.length > 0 && (
           <>
             <Divider sx={{ my: 2 }} />
-            <Typography>
-              <strong>Predicted shift:</strong> {prediction}
-              {uncertainty && <> ± {uncertainty}</>}
+            <Typography variant="h6" gutterBottom>
+              Predicted Shifts
             </Typography>
-            {confidence && (
-              <Typography sx={{ mt: 1 }}>
-                <strong>Confidence level:</strong>{' '}
-                {confidence === 'high' && <span style={{ color: 'green' }}>🟢 High</span>}
-                {confidence === 'moderate' && <span style={{ color: 'orange' }}>🟡 Moderate</span>}
-                {confidence === 'low' && <span style={{ color: 'red' }}>🔴 Low</span>}
-              </Typography>
-            )}
+            {prediction.map((result, index) => (
+              <Box key={index} sx={{ mb: 1 }}>
+                <Typography>
+                  <strong>Point {index + 1}:</strong> {result.prediction} (± {result.uncertainty_sd})
+                </Typography>
+                <Typography variant="body2" sx={{ ml: 2 }}>
+                  Confidence: 
+                  {result.confidence_level === 'high' && <span style={{ color: 'green' }}> 🟢 High</span>}
+                  {result.confidence_level === 'moderate' && <span style={{ color: 'orange' }}> 🟡 Moderate</span>}
+                  {result.confidence_level === 'low' && <span style={{ color: 'red' }}> 🔴 Low</span>}
+                </Typography>
+              </Box>
+            ))}
           </>
         )}
+
       </Paper>
     </Container>
   );

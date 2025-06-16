@@ -19,11 +19,23 @@ def ping():
 def predict():
     try:
         data = request.get_json()
-        spo2 = float(data.get("SpO2"))
-        pio2 = float(data.get("PiO2"))
+        inputs = data.get("inputs")
 
-        result = predict_shift(spo2, pio2)
-        return jsonify(result)
+        if not inputs or not isinstance(inputs, list):
+            
+            raise ValueError(inputs)
+        
+        if len(inputs) == 1:
+            pio2, spo2 = map(float, inputs[0])
+            result = predict_shift(spo2, pio2)
+            return jsonify({"prediction": result})
+
+        # Case 2: Multiple datapoints → placeholder for future implementation
+        else:
+            return jsonify({
+                "prediction": None,
+                "message": "Multi-point prediction is not implemented yet. Received {} datapoints.".format(len(inputs))
+            })
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
