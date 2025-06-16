@@ -2,6 +2,8 @@ import React, { useState } from 'react'; // useState for dynamic values
 import { Box, Container, Typography, TextField, Button, IconButton, Paper , Alert, Divider , Grid} from '@mui/material';
 
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import Plot from 'react-plotly.js';
+
 
 function PredictForm() {
   const [datapoints, setDatapoints] = useState([{ pio2: '', spo2: '' }]);
@@ -10,6 +12,8 @@ function PredictForm() {
   const [uncertainty, setUncertainty] = useState(null);
   const [error, setError] = useState(null); 
   const [confidence, setConfidence] = useState(null); // state to hold confidence level
+  const [odcPlot, setOdcPlot] = useState(null);
+
 
   const handleInputChange = (index, field, value) => {
     const updated = [...datapoints];
@@ -49,7 +53,6 @@ function PredictForm() {
       });
 
       const data = await res.json(); // response parsed as JSON
-
       if (data.error) {
         setError(`Server error: ${data.error}`);
       } else if (Array.isArray(data.prediction)) {
@@ -60,6 +63,9 @@ function PredictForm() {
         setPrediction([data.prediction]); // wrap single prediction into array
         setUncertainty(data.prediction.uncertainty_sd ?? null);
         setConfidence(data.prediction.confidence_level ?? null);
+        if (data.odc_plot) {
+          setOdcPlot(data.odc_plot);
+        }
       } else {
         setError("Unexpected response format from backend.");
       }
@@ -145,6 +151,46 @@ function PredictForm() {
             ))}
           </>
         )}
+      {odcPlot && (
+        <>
+          <Divider sx={{ my: 2 }} />
+          <Typography variant="h6" gutterBottom>
+            ODC Curve
+          </Typography>
+          <Plot
+            data={[
+              {
+                x: odcPlot.po2,
+                y: odcPlot.reference_spo2,
+                mode: 'lines',
+                name: 'Reference ODC',
+                line: { dash: 'dash', color: 'blue' }
+              },
+              {
+                x: odcPlot.po2,
+                y: odcPlot.predicted_spo2,
+                mode: 'lines',
+                name: 'Predicted ODC',
+                line: { color: 'orange' }
+              },
+              {
+                x: odcPlot.measured_points.map(p => p[0]),
+                y: odcPlot.measured_points.map(p => p[1]),
+                mode: 'markers',
+                name: 'Measured Point',
+                marker: { color: 'black', size: 8 }
+              }
+            ]}
+            layout={{
+              title: 'Oxyhaemoglobin Dissociation Curve',
+              xaxis: { title: 'PiO₂ (kPa)' },
+              yaxis: { title: 'SpO₂ (%)', range: [0, 100] },
+              margin: { t: 30, r: 10, l: 50, b: 50 }
+            }}
+            style={{ width: '100%', height: '400px' }}
+          />
+        </>
+      )}
 
       </Paper>
     </Container>
