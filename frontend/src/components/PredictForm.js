@@ -1,7 +1,7 @@
 import React, { useState } from 'react'; // useState for dynamic values
 import { Box, Container, Typography, TextField, Button, IconButton, Paper , Alert, Divider , Grid} from '@mui/material';
-
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import Plot from 'react-plotly.js';
 
 
@@ -13,6 +13,7 @@ function PredictForm() {
   const [error, setError] = useState(null); 
   const [confidence, setConfidence] = useState(null); // state to hold confidence level
   const [odcPlot, setOdcPlot] = useState(null);
+  const isMobile = useMediaQuery('(max-width:600px)');
 
 
   const handleInputChange = (index, field, value) => {
@@ -80,8 +81,8 @@ function PredictForm() {
         <Typography variant="h5" gutterBottom>ODC Shift Prediction</Typography>
         <form onSubmit={handleSubmit}>
           {datapoints.map((dp, index) => (
-            <Grid container spacing={2} key={index} alignItems="center" sx={{ mb: 1 }}>
-              <Grid item xs={5}>
+            <Grid container spacing={1} key={index} alignItems="center" sx={{ mb: 1 , flexWrap: 'nowrap' }}>
+              <Grid item xs={6} sm= {5}>
                 <TextField
                   label="Inspired O₂ (kPa)"
                   type="number"
@@ -91,7 +92,7 @@ function PredictForm() {
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={5}>
+              <Grid item xs={6} sm= {5}>
                 <TextField
                   label="SpO₂ (%)"
                   type="number"
@@ -101,12 +102,12 @@ function PredictForm() {
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={2}>
-                {datapoints.length > 1 && index > 0 && (
+              <Grid item xs={2} sm = {2}>
+                {datapoints.length > 1 &&  (
                   <Button
                     color="error"
                     onClick={() => removeDatapoint(index)}
-                    sx={{ minWidth: 0 }}
+                    sx={{ minWidth: 0, visibility: index === 0 ? 'hidden' : 'visible' }}
                   >
                     X
                   </Button>
@@ -157,38 +158,64 @@ function PredictForm() {
           <Typography variant="h6" gutterBottom>
             ODC Curve
           </Typography>
-          <Plot
-            data={[
-              {
-                x: odcPlot.po2,
-                y: odcPlot.reference_spo2,
-                mode: 'lines',
-                name: 'Reference ODC',
-                line: { dash: 'dash', color: 'blue' }
-              },
-              {
-                x: odcPlot.po2,
-                y: odcPlot.predicted_spo2,
-                mode: 'lines',
-                name: 'Predicted ODC',
-                line: { color: 'orange' }
-              },
-              {
-                x: odcPlot.measured_points.map(p => p[0]),
-                y: odcPlot.measured_points.map(p => p[1]),
-                mode: 'markers',
-                name: 'Measured Point',
-                marker: { color: 'black', size: 8 }
-              }
-            ]}
-            layout={{
-              title: 'Oxyhaemoglobin Dissociation Curve',
-              xaxis: { title: 'PiO₂ (kPa)' },
-              yaxis: { title: 'SpO₂ (%)', range: [0, 100] },
-              margin: { t: 30, r: 10, l: 50, b: 50 }
+          <Box 
+            sx={{
+              width: '100%',
+              height: isMobile ? 300 : 400, // add explicit height!
             }}
-            style={{ width: '100%', height: '400px' }}
-          />
+          >
+            <Plot
+              data={[
+                {
+                  x: odcPlot.po2,
+                  y: odcPlot.reference_spo2,
+                  mode: 'lines',
+                  name: 'Reference ODC',
+                  line: { dash: 'dash', color: 'blue' }
+                },
+                {
+                  x: odcPlot.po2,
+                  y: odcPlot.predicted_spo2,
+                  mode: 'lines',
+                  name: 'Predicted ODC',
+                  line: { color: 'orange' }
+                },
+                {
+                  x: odcPlot.measured_points.map(p => p[0]),
+                  y: odcPlot.measured_points.map(p => p[1]),
+                  mode: 'markers',
+                  name: 'Measured Point',
+                  marker: { color: 'black', size: 8 }
+                }
+              ]}
+              layout={{
+                title: 'Oxyhaemoglobin Dissociation Curve',
+                xaxis: { title: 'PiO₂ (kPa)' },
+                yaxis: { title: 'SpO₂ (%)', range: [0, 100] },
+                margin: { t: 30, r: 10, l: 50, b: 50 },
+                autosize: true,
+                legend: isMobile
+                  ? {
+                      orientation: 'h',
+                      x: 0.5,
+                      xanchor: 'center',
+                      y: -0.3,
+                      yanchor: 'top'
+                    }
+                  : {
+                      orientation: 'v',
+                      x: 1,
+                      xanchor: 'right',
+                      y: 0,
+                      yanchor: 'bottom'
+                    }
+
+              }}
+              useResizeHandler={true}
+              config={{ responsive: true }}
+              style={{ width: '100%', height: '100%' }}
+            />
+          </Box>
         </>
       )}
 
