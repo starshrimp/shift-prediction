@@ -4,7 +4,8 @@ import joblib
 import numpy as np
 import pandas as pd
 from odc.odc_lookup import ODCInterpolator
-from predict.predict_1point import predict_shift
+#from predict.predict_1point import predict_shift
+from predict.predict_bayesian import predict_shift
 from odc.odc_plot_builder import prepare_odc_plot_data
 from collections import Counter
 
