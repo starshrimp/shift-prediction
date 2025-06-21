@@ -1,14 +1,34 @@
 import React, { useState } from 'react'; // useState for dynamic values
+import { Box, Container, Typography, TextField, Button, IconButton, Paper , Alert, Divider , Grid} from '@mui/material';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import Plot from 'react-plotly.js';
+
 
 function PredictForm() {
-  const [pio2, setPio2] = useState('');
-  const [spo2, setSpo2] = useState('');
+  const [datapoints, setDatapoints] = useState([{ pio2: '', spo2: '' }]);
   const [submitted, setSubmitted] = useState(false); // whether form has been submitted
   const [prediction, setPrediction] = useState(null);
   const [uncertainty, setUncertainty] = useState(null);
   const [error, setError] = useState(null); 
   const [confidence, setConfidence] = useState(null); // state to hold confidence level
+  const [odcPlot, setOdcPlot] = useState(null);
+  const isMobile = useMediaQuery('(max-width:600px)');
 
+
+  const handleInputChange = (index, field, value) => {
+    const updated = [...datapoints];
+    updated[index][field] = value;
+    setDatapoints(updated);
+  };
+
+  const addDatapoint = () => {
+    setDatapoints([...datapoints, { pio2: '', spo2: '' }]);
+  };
+
+  const removeDatapoint = (indexToRemove) => {
+  setDatapoints((prev) => prev.filter((_, i) => i !== indexToRemove));
+};
 
   const handleSubmit = async (e) => { //async function to handle form submission
     e.preventDefault(); // prevents page from reloading (HTML default behavior)
@@ -16,10 +36,11 @@ function PredictForm() {
     setPrediction(null);
     setUncertainty(null);
     setError(null);
+    setConfidence(null);
+
 
     const payload = {
-      PiO2: pio2 !== '' ? parseFloat(pio2) : null,
-      SpO2: spo2 !== '' ? parseFloat(spo2) : null
+      inputs: datapoints.map(dp => [parseFloat(dp.pio2), parseFloat(dp.spo2)])
     };
 
 
@@ -33,15 +54,21 @@ function PredictForm() {
       });
 
       const data = await res.json(); // response parsed as JSON
-
       if (data.error) {
-        setPrediction(`Server error: ${data.error}`);
-      } else {
+        setError(`Server error: ${data.error}`);
+      } else if (Array.isArray(data.prediction)) {
         setPrediction(data.prediction);
-        setUncertainty(data.uncertainty_sd);
-        setConfidence(data.confidence_level);
-
-
+        setUncertainty(null); // optional: could compute mean or min/max SD here
+        setConfidence(null);  // optional: could infer aggregate confidence
+      } else if (typeof data.prediction === 'object') {
+        setPrediction([data.prediction]); // wrap single prediction into array
+        setUncertainty(data.prediction.uncertainty_sd ?? null);
+        setConfidence(data.prediction.confidence_level ?? null);
+        if (data.odc_plot) {
+          setOdcPlot(data.odc_plot);
+        }
+      } else {
+        setError("Unexpected response format from backend.");
       }
     } catch (err) {
       setPrediction("Network or server error");
@@ -49,60 +76,151 @@ function PredictForm() {
     }; //e is event object -> created when submission occurs
 
   return ( //JSX syntax -> rendered UI
-    <div>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Inspired O₂ (PiO₂ in kPa): 
-          <input
-            type="number"
-            step="any"
-            value={pio2}
-            onChange={(e) => setPio2(e.target.value)} //e.target.value is input typed 
-            required
-          />
-        </label>
-        <br />
-        <label>
-          SpO₂ (%): 
-          <input
-            type="number"
-            step="any"
-            value={spo2}
-            onChange={(e) => setSpo2(e.target.value)}
-            required
-          />
-        </label>
-        <br />
-        <button type="submit">Submit</button>
-      </form>
-      
-    {error && <p style={{ color: "red" }}>Error: {error}</p>}
+    <Container maxWidth="sm" sx={{ mt: 4 }}>
+      <Paper elevation={3} sx={{ p: 3 }}>
+        <Typography variant="h5" gutterBottom>ODC Shift Prediction</Typography>
+        <form onSubmit={handleSubmit}>
+          {datapoints.map((dp, index) => (
+            <Grid container spacing={1} key={index} alignItems="center" sx={{ mb: 1 , flexWrap: 'nowrap' }}>
+              <Grid item xs={6} sm= {5}>
+                <TextField
+                  label="Inspired O₂ (kPa)"
+                  type="number"
+                  value={dp.pio2}
+                  onChange={(e) => handleInputChange(index, 'pio2', e.target.value)}
+                  required
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={6} sm= {5}>
+                <TextField
+                  label="SpO₂ (%)"
+                  type="number"
+                  value={dp.spo2}
+                  onChange={(e) => handleInputChange(index, 'spo2', e.target.value)}
+                  required
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={2} sm = {2}>
+                {datapoints.length > 1 &&  (
+                  <Button
+                    color="error"
+                    onClick={() => removeDatapoint(index)}
+                    sx={{ minWidth: 0, visibility: index === 0 ? 'hidden' : 'visible' }}
+                  >
+                    X
+                  </Button>
+                )}
+              </Grid>
+
+            </Grid>
+          ))}
 
 
+          <Box display="flex" justifyContent="center" mb={2}>
+            <IconButton color="primary" onClick={addDatapoint}>
+              <AddCircleOutlineIcon />
+            </IconButton>
+          </Box>
 
-      {submitted && ( // only shows if submitted
-        <p>
-          You entered PiO₂ = <strong>{pio2}</strong> kPa and SpO₂ = <strong>{spo2}</strong>%
-        </p>
-      )}
-      {prediction && <p>{prediction}</p>}
+          <Button type="submit" variant="contained" fullWidth>
+            Submit
+          </Button>
+        </form>
 
-      {prediction !== null && (
-          <p>
-            <strong>Predicted shift:</strong> {prediction}
-            {uncertainty !== null && <> ± {uncertainty}</>}
-          </p>
+        {error && <Typography color="error" sx={{ mt: 2 }}>{error}</Typography>}
+
+       {Array.isArray(prediction) && prediction.length > 0 && (
+          <>
+            <Divider sx={{ my: 2 }} />
+            <Typography variant="h6" gutterBottom>
+              Predicted Shifts
+            </Typography>
+            {prediction.map((result, index) => (
+              <Box key={index} sx={{ mb: 1 }}>
+                <Typography>
+                  <strong>Point {index + 1}:</strong> {result.prediction} (± {result.uncertainty_sd})
+                </Typography>
+                <Typography variant="body2" sx={{ ml: 2 }}>
+                  Confidence: 
+                  {result.confidence_level === 'high' && <span style={{ color: 'green' }}> 🟢 High</span>}
+                  {result.confidence_level === 'moderate' && <span style={{ color: 'orange' }}> 🟡 Moderate</span>}
+                  {result.confidence_level === 'low' && <span style={{ color: 'red' }}> 🔴 Low</span>}
+                </Typography>
+              </Box>
+            ))}
+          </>
         )}
-      {confidence && (
-        <p>
-          <strong>Confidence level:</strong>{' '}
-          {confidence === 'high' && <span style={{ color: 'green' }}>🟢 High</span>}
-          {confidence === 'moderate' && <span style={{ color: 'orange' }}>🟡 Moderate</span>}
-          {confidence === 'low' && <span style={{ color: 'red' }}>🔴 Low</span>}
-        </p>
+      {odcPlot && (
+        <>
+          <Divider sx={{ my: 2 }} />
+          <Typography variant="h6" gutterBottom>
+            ODC Curve
+          </Typography>
+          <Box 
+            sx={{
+              width: '100%',
+              height: isMobile ? 300 : 400, // add explicit height!
+            }}
+          >
+            <Plot
+              data={[
+                {
+                  x: odcPlot.po2,
+                  y: odcPlot.reference_spo2,
+                  mode: 'lines',
+                  name: 'Reference ODC',
+                  line: { dash: 'dash', color: 'blue' }
+                },
+                {
+                  x: odcPlot.po2,
+                  y: odcPlot.predicted_spo2,
+                  mode: 'lines',
+                  name: 'Predicted ODC',
+                  line: { color: 'orange' }
+                },
+                {
+                  x: odcPlot.measured_points.map(p => p[0]),
+                  y: odcPlot.measured_points.map(p => p[1]),
+                  mode: 'markers',
+                  name: 'Measured Point',
+                  marker: { color: 'black', size: 8 }
+                }
+              ]}
+              layout={{
+                title: 'Oxyhaemoglobin Dissociation Curve',
+                xaxis: { title: 'PiO₂ (kPa)' },
+                yaxis: { title: 'SpO₂ (%)', range: [0, 100] },
+                margin: { t: 30, r: 10, l: 50, b: 50 },
+                autosize: true,
+                legend: isMobile
+                  ? {
+                      orientation: 'h',
+                      x: 0.5,
+                      xanchor: 'center',
+                      y: -0.3,
+                      yanchor: 'top'
+                    }
+                  : {
+                      orientation: 'v',
+                      x: 1,
+                      xanchor: 'right',
+                      y: 0,
+                      yanchor: 'bottom'
+                    }
+
+              }}
+              useResizeHandler={true}
+              config={{ responsive: true }}
+              style={{ width: '100%', height: '100%' }}
+            />
+          </Box>
+        </>
       )}
 
-    </div>
+      </Paper>
+    </Container>
   );
 }
 
