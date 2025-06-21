@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: shift-backend
+    env: docker
+    repo: https://github.com/starshrimp/shift_prediction
+    branch: main
+    dockerfilePath: backend/Dockerfile
+    buildFilter:
+      paths:
+        - backend/**
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: PORT
+        value: 5000
