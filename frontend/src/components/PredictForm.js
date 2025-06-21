@@ -45,7 +45,7 @@ function PredictForm() {
 
 
     try {
-      const res = await fetch('http://127.0.0.1:5000/predict', { // await = wait for response from backend
+      const res = await fetch('https://odc-shift-prediction.onrender.com/predict', { // await = wait for response from backend
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
