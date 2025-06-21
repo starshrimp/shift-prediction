@@ -68,7 +68,8 @@ def predict():
 
         # --- Aggregate results ---
         shift_mean = float(np.mean(shifts))
-        uncertainty_mean = float(np.mean([u for u in uncertainties if u is not None]))
+        filtered_uncertainties = [u for u in uncertainties if u is not None]
+        uncertainty_mean = float(np.mean(filtered_uncertainties)) if filtered_uncertainties else None
         confidence_mode = Counter(confidences).most_common(1)[0][0] if confidences else None
 
         p50 = p50_ref + shift_mean
