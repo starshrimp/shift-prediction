@@ -7,11 +7,11 @@ import Plot from 'react-plotly.js';
 
 function PredictForm() {
   const [datapoints, setDatapoints] = useState([{ pio2: '', spo2: '' }]);
-  const [submitted, setSubmitted] = useState(false); // whether form has been submitted
+  // const [submitted, setSubmitted] = useState(false); // whether form has been submitted
   const [prediction, setPrediction] = useState(null);
-  const [uncertainty, setUncertainty] = useState(null);
+  // const [uncertainty, setUncertainty] = useState(null);
   const [error, setError] = useState(null); 
-  const [confidence, setConfidence] = useState(null); // state to hold confidence level
+  // const [confidence, setConfidence] = useState(null); // state to hold confidence level
   const [odcPlot, setOdcPlot] = useState(null);
   const isMobile = useMediaQuery('(max-width:600px)');
 
