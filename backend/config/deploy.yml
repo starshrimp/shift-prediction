@@ -2,12 +2,12 @@
 service: shift-prediction
 
 # Name of the container image.
-image: starshrimp/shift-prediction
+image: ghcr.io/starshrimp/shift-prediction
 
 # Deploy to these servers.
 servers:
   web:
-    - app.rubymonstas.ch
+    - apps.rubymonstas.ch
   # job:
   #   hosts:
   #     - 192.168.0.1
@@ -19,7 +19,7 @@ servers:
 # Note: If using Cloudflare, set encryption mode in SSL/TLS setting to "Full" to enable CF-to-app encryption.
 proxy:
   ssl: true
-  host: shift_prediction.app.rubymonstas.ch
+  host: shift_prediction.apps.rubymonstas.ch
   # Proxy connects to your container on port 80 by default.
   app_port: 5000
 
