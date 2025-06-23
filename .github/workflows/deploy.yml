@@ -29,7 +29,7 @@ jobs:
         run: gem install kamal
 
       - name: Deploy with Kamal
-        with:
+        env:
           RAILS_ENV: production
           KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
           KAMAL_REGISTRY_USERNAME: starshrimp
