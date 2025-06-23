@@ -37,6 +37,4 @@ jobs:
           # environment: 'staging'  # Optional, only used if provided
           registry-username: ${{ secrets.KAMAL_REGISTRY_USERNAME }}
           registry-password: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
-        run: |
-          echo ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
-          kamal deploy
+
