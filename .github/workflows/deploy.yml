@@ -32,10 +32,10 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Deploy with Kamal
-        env:
-          RAILS_ENV: production
+        env:  
           KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
           KAMAL_REGISTRY_USERNAME: starshrimp
           KAMAL_SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
+          echo ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
           kamal deploy
