@@ -17,6 +17,11 @@ CORS(app)
 def home():
     return "🎉 Hello from Dockerized Flask app!"
 
+@app.route("/up")
+def health_check():
+    return "OK", 200
+
+
 @app.route("/ping", methods=["GET"])
 def ping():
     return jsonify({"message": "pong"}), 200
