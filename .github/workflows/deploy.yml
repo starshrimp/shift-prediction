@@ -32,6 +32,7 @@ jobs:
         env:
           RAILS_ENV: production
           KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
-          KAMAL_REGISTRY_USERNAME: ${{ secrets.KAMAL_REGISTRY_USERNAME }}
+          KAMAL_REGISTRY_USERNAME: starshrimp
+          KAMAL_SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           kamal deploy
