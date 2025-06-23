@@ -5,7 +5,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import Plot from 'react-plotly.js';
 
 
-function PredictForm() {
+function PredictForm({ altitude }) {
   const [datapoints, setDatapoints] = useState([{ pio2: '', spo2: '' }]);
   const [submitted, setSubmitted] = useState(false); // whether form has been submitted
   const [prediction, setPrediction] = useState(null);
@@ -27,8 +27,21 @@ function PredictForm() {
   };
 
   const removeDatapoint = (indexToRemove) => {
-  setDatapoints((prev) => prev.filter((_, i) => i !== indexToRemove));
-};
+    setDatapoints((prev) => prev.filter((_, i) => i !== indexToRemove));
+  };
+
+  const computePiO2 = (altitude) => {
+    const P0 = 101.325; // kPa at sea level
+    const PH2O = 6.3;   // water vapor pressure in kPa
+    const FiO2 = 0.21;  // room air
+
+    // Barometric pressure formula
+    const P = P0 * Math.pow(1 - 2.25577e-5 * altitude, 5.25588);
+    return ((P - PH2O) * FiO2).toFixed(2); // Round to 2 decimals
+  };
+
+  const basePiO2 = computePiO2(altitude);
+
 
   const handleSubmit = async (e) => { //async function to handle form submission
     e.preventDefault(); // prevents page from reloading (HTML default behavior)
@@ -79,6 +92,10 @@ function PredictForm() {
     <Container maxWidth="sm" sx={{ mt: 4 }}>
       <Paper elevation={3} sx={{ p: 3 }}>
         <Typography variant="h5" gutterBottom>ODC Shift Prediction</Typography>
+        <Typography variant="body2" sx={{ mb: 2 }}>
+          Estimated PiO₂ at rest (based on altitude {altitude} m): <strong>{basePiO2} kPa</strong>
+        </Typography>
+
         <form onSubmit={handleSubmit}>
           {datapoints.map((dp, index) => (
             <Grid container spacing={1} key={index} alignItems="center" sx={{ mb: 1 , flexWrap: 'nowrap' }}>
