@@ -45,7 +45,7 @@ function PredictForm() {
 
 
     try {
-      const res = await fetch('${process.env.REACT_APP_API_ENDPOINT}/predict', { // await = wait for response from backend
+      const res = await fetch(`${process.env.REACT_APP_API_ENDPOINT}/predict`, { // await = wait for response from backend
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
