@@ -1,8 +1,8 @@
 FROM python:3.10-slim
 
-WORKDIR /backend
+WORKDIR /app
 
-COPY . .
+COPY backend/ .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
