@@ -13,19 +13,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up SSH key and trust known host
+      - name: Clear known_hosts and trust server
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-          # Remove old entries for both hostname and IP
+          # Fully reset known hosts
           ssh-keygen -R apps.rubymonstas.ch || true
           ssh-keygen -R 116.203.85.111 || true
 
-          # Add updated known host entries
+          # Trust the current keys
           ssh-keyscan -H apps.rubymonstas.ch >> ~/.ssh/known_hosts
           ssh-keyscan -H 116.203.85.111 >> ~/.ssh/known_hosts
+
+          # Proactively test SSH (this avoids lazy fingerprint caching later)
+          ssh -o StrictHostKeyChecking=yes -i ~/.ssh/id_rsa root@apps.rubymonstas.ch "echo SSH OK"
 
 
       - name: Install Ruby and Kamal
