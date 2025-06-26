@@ -3,6 +3,8 @@ import { Box, Container, Typography, TextField, Button, IconButton, Paper , Aler
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Plot from 'react-plotly.js';
+import { spo2OutOfRange, pio2OutOfRange } from "../utils/validation";
+
 
 
 function PredictForm() {
@@ -90,6 +92,13 @@ function PredictForm() {
                   onChange={(e) => handleInputChange(index, 'pio2', e.target.value)}
                   required
                   fullWidth
+                  error={pio2OutOfRange(dp.pio2)}
+                  helperText={pio2OutOfRange(dp.pio2) ? "Inspired O₂ must be between 13 and 30 kPa" : ""}
+                  slotProps={{
+                    step: 0.1,
+                    min: 13,
+                    max: 30,
+                  }}
                 />
               </Grid>
               <Grid item xs={6} sm= {5}>
@@ -100,6 +109,13 @@ function PredictForm() {
                   onChange={(e) => handleInputChange(index, 'spo2', e.target.value)}
                   required
                   fullWidth
+                  error={spo2OutOfRange(dp.spo2)}
+                  helperText={spo2OutOfRange(dp.spo2) ? "SpO₂ must be between 80 and 100%" : ""} 
+                  slotProps={{
+                    step: 0.1,
+                    min: 80,
+                    max: 100,
+                  }}
                 />
               </Grid>
               <Grid item xs={2} sm = {2}>
