@@ -24,6 +24,15 @@ function PredictForm() {
     setDatapoints(updated);
   };
 
+  const hasInvalidInputs = datapoints.some(
+    (dp) =>
+      dp.pio2 === '' ||
+      dp.spo2 === '' ||
+      spo2OutOfRange(dp.spo2) ||
+      pio2OutOfRange(dp.pio2)
+  );
+
+
   const addDatapoint = () => {
     setDatapoints([...datapoints, { pio2: '', spo2: '' }]);
   };
@@ -140,7 +149,7 @@ function PredictForm() {
             </IconButton>
           </Box>
 
-          <Button type="submit" variant="contained" fullWidth>
+          <Button type="submit" variant="contained" fullWidth disabled={hasInvalidInputs}>
             Submit
           </Button>
         </form>
