@@ -190,12 +190,12 @@ function PredictForm() {
                 <Typography>
                   <strong>Point {index + 1}:</strong> {result.prediction} (± {result.uncertainty_sd?.toFixed(2)})
                 </Typography>
-                <Typography variant="body2" sx={{ ml: 2 }}>
+                {/* <Typography variant="body2" sx={{ ml: 2 }}>
                   Confidence: 
                   {result.confidence_level === 'high' && <span style={{ color: 'green' }}> 🟢 High</span>}
                   {result.confidence_level === 'moderate' && <span style={{ color: 'orange' }}> 🟡 Moderate</span>}
                   {result.confidence_level === 'low' && <span style={{ color: 'red' }}> 🔴 Low</span>}
-                </Typography>
+                </Typography> */}
               </Box>
             ))}
           </>
