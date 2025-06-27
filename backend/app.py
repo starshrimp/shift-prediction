@@ -7,6 +7,7 @@ from odc.odc_lookup import ODCInterpolator
 #from predict.predict_1point import predict_shift
 from predict.predict_bayesian import predict_shift
 from odc.odc_plot_builder import prepare_odc_plot_data
+from utils.validation import validate_input_row
 from collections import Counter
 
 
@@ -35,6 +36,22 @@ def predict():
 
         if not inputs or not isinstance(inputs, list):
             raise ValueError("Missing or invalid 'inputs' format")
+
+        # Validate each datapoint
+        for idx, pair in enumerate(inputs):
+            if not isinstance(pair, list) or len(pair) != 2:
+                return jsonify({"error": f"Invalid input at row {idx + 1} — must be [pio2, spo2]"}), 400
+
+            try:
+                pio2, spo2 = float(pair[0]), float(pair[1])
+            except (ValueError, TypeError):
+                return jsonify({"error": f"Non-numeric input at row {idx + 1}"}), 400
+
+            if not (13 <= pio2 <= 30):
+                return jsonify({"error": f"Inspired O₂ at row {idx + 1} must be between 13 and 30 kPa"}), 400
+            if not (80 <= spo2 <= 100):
+                return jsonify({"error": f"SpO₂ at row {idx + 1} must be between 80% and 100%"}), 400
+
 
         # --- Load ODC + reference P50 ---
         odc = ODCInterpolator()
