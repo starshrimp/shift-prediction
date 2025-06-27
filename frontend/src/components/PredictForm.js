@@ -183,12 +183,12 @@ function PredictForm() {
           <>
             <Divider sx={{ my: 2 }} />
             <Typography variant="h6" gutterBottom>
-              Predicted Shifts
+              Predicted Shift
             </Typography>
             {prediction.map((result, index) => (
               <Box key={index} sx={{ mb: 1 }}>
                 <Typography>
-                  <strong>Point {index + 1}:</strong> {result.prediction} (± {result.uncertainty_sd?.toFixed(2)})
+                  {result.prediction} (± {result.uncertainty_sd?.toFixed(2)})
                 </Typography>
                 {/* <Typography variant="body2" sx={{ ml: 2 }}>
                   Confidence: 
