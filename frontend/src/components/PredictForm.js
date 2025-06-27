@@ -138,10 +138,11 @@ function PredictForm() {
                   </Button>
                 )}
               </Grid>
-
             </Grid>
           ))}
-
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0, mb: 1 }}>
+              ℹ️ Best model performance is achieved with Inspired O₂ values between <strong>15–30 kPa</strong> and SpO₂ between <strong>88–95%</strong>.
+            </Typography>
 
           <Box display="flex" justifyContent="center" mb={2}>
             <IconButton color="primary" onClick={addDatapoint}>
