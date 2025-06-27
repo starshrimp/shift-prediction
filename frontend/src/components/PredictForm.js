@@ -198,7 +198,7 @@ function PredictForm() {
             {prediction.map((result, index) => (
               <Box key={index} sx={{ mb: 1 }}>
                 <Typography>
-                  <strong>Point {index + 1}:</strong> {result.prediction} (± {result.uncertainty_sd})
+                  <strong>Point {index + 1}:</strong> {result.prediction} (± {result.uncertainty_sd?.toFixed(2)})
                 </Typography>
                 <Typography variant="body2" sx={{ ml: 2 }}>
                   Confidence: 
