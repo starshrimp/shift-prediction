@@ -23,12 +23,16 @@ jobs:
           ssh-keygen -R apps.rubymonstas.ch || true
           ssh-keygen -R 116.203.85.111 || true
 
-          # Trust the current keys
+          # Trust the new keys (replace IP with your actual server if different)
           ssh-keyscan -H apps.rubymonstas.ch >> ~/.ssh/known_hosts
           ssh-keyscan -H 116.203.85.111 >> ~/.ssh/known_hosts
 
-          # Proactively test SSH (this avoids lazy fingerprint caching later)
+          # View the new fingerprint (debugging)
+          ssh-keygen -lf ~/.ssh/known_hosts
+
+          # Proactively test SSH
           ssh -o StrictHostKeyChecking=yes -i ~/.ssh/id_rsa root@apps.rubymonstas.ch "echo SSH OK"
+
 
 
       - name: Install Ruby and Kamal
