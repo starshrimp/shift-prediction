@@ -93,7 +93,7 @@ function PredictForm() {
         <form onSubmit={handleSubmit}>
           {datapoints.map((dp, index) => (
             <Grid container spacing={1} key={index} alignItems="center" sx={{ mb: 1 , flexWrap: 'nowrap' }}>
-              <Grid item xs={6} sm= {5}>
+              <Grid item xs={6} sm={5}>
                 <TextField
                   label="Inspired O₂ (kPa)"
                   type="number"
@@ -102,15 +102,31 @@ function PredictForm() {
                   required
                   fullWidth
                   error={pio2OutOfRange(dp.pio2)}
-                  helperText={pio2OutOfRange(dp.pio2) ? "Inspired O₂ must be between 13 and 30 kPa" : ""}
+                  helperText={
+                    pio2OutOfRange(dp.pio2)
+                      ? "Inspired O₂ must be between 13 and 30 kPa"
+                      : " "
+                  }
                   slotProps={{
                     step: 0.1,
                     min: 13,
                     max: 30,
                   }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      height: 56,
+                    },
+                    '& .MuiFormHelperText-root': {
+                      whiteSpace: 'normal',
+                      lineHeight: 1.25,
+                      minHeight: '2.5em',
+                      mt: 0.5,
+                    }
+                  }}
                 />
               </Grid>
-              <Grid item xs={6} sm= {5}>
+
+              <Grid item xs={6} sm={5}>
                 <TextField
                   label="SpO₂ (%)"
                   type="number"
@@ -119,14 +135,30 @@ function PredictForm() {
                   required
                   fullWidth
                   error={spo2OutOfRange(dp.spo2)}
-                  helperText={spo2OutOfRange(dp.spo2) ? "SpO₂ must be between 80 and 100%" : ""} 
+                  helperText={
+                    spo2OutOfRange(dp.spo2)
+                      ? "SpO₂ must be between 80 and 100%"
+                      : " "
+                  }
                   slotProps={{
                     step: 0.1,
                     min: 80,
                     max: 100,
                   }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      height: 56,
+                    },
+                    '& .MuiFormHelperText-root': {
+                      whiteSpace: 'normal',
+                      lineHeight: 1.25,
+                      minHeight: '2.5em',
+                      mt: 0.5,
+                    }
+                  }}
                 />
               </Grid>
+
               <Grid item xs={2} sm = {2}>
                 {datapoints.length > 1 &&  (
                   <Button
