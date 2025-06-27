@@ -52,5 +52,5 @@ jobs:
           KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
           KAMAL_SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
-          kamal deploy
+          kamal deploy --skip-hostkey-verification
 
