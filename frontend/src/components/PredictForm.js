@@ -1,5 +1,5 @@
 import React, { useState } from 'react'; // useState for dynamic values
-import { Box, Container, Typography, TextField, Button, IconButton, Paper , Alert, Divider , Grid} from '@mui/material';
+import { Box, Container, Typography, TextField, Button, IconButton, Paper , Divider , Grid} from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Plot from 'react-plotly.js';
@@ -9,11 +9,8 @@ import { spo2OutOfRange, pio2OutOfRange } from "../utils/validation";
 
 function PredictForm() {
   const [datapoints, setDatapoints] = useState([{ pio2: '', spo2: '' }]);
-  const [submitted, setSubmitted] = useState(false); // whether form has been submitted
   const [prediction, setPrediction] = useState(null);
-  const [uncertainty, setUncertainty] = useState(null);
   const [error, setError] = useState(null); 
-  const [confidence, setConfidence] = useState(null); // state to hold confidence level
   const [odcPlot, setOdcPlot] = useState(null);
   const isMobile = useMediaQuery('(max-width:600px)');
 
@@ -43,11 +40,8 @@ function PredictForm() {
 
   const handleSubmit = async (e) => { //async function to handle form submission
     e.preventDefault(); // prevents page from reloading (HTML default behavior)
-    setSubmitted(true);
     setPrediction(null);
-    setUncertainty(null);
     setError(null);
-    setConfidence(null);
 
 
     const payload = {
@@ -69,12 +63,8 @@ function PredictForm() {
         setError(`Server error: ${data.error}`);
       } else if (Array.isArray(data.prediction)) {
         setPrediction(data.prediction);
-        setUncertainty(null); // optional: could compute mean or min/max SD here
-        setConfidence(null);  // optional: could infer aggregate confidence
       } else if (typeof data.prediction === 'object') {
         setPrediction([data.prediction]); // wrap single prediction into array
-        setUncertainty(data.prediction.uncertainty_sd ?? null);
-        setConfidence(data.prediction.confidence_level ?? null);
         if (data.odc_plot) {
           setOdcPlot(data.odc_plot);
         }
