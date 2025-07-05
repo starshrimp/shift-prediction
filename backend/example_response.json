@@ -1,0 +1,13 @@
+{
+  "prediction": {
+    "prediction": 0.23,
+    "uncertainty_sd": 0.05,
+    "confidence_level": "high"
+  },
+  "odc_plot": {
+    "po2": [10.0, 11.0, 12.0],
+    "reference_spo2": [80.1, 83.5, 86.2, ...],
+    "predicted_spo2": [78.6, 82.0, 84.9, ...],
+    "measured_points": [[15.2, 91.0], [18.7, 95.1]]
+  }
+}
