@@ -65,7 +65,6 @@ function PredictForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
     setPrediction(null);
     setError(null);
 
@@ -87,12 +86,8 @@ function PredictForm() {
         setError(`Server error: ${data.error}`);
       } else if (Array.isArray(data.prediction)) {
         setPrediction(data.prediction);
-        setUncertainty(null);
-        setConfidence(null);
       } else if (typeof data.prediction === 'object') {
         setPrediction([data.prediction]);
-        setUncertainty(data.prediction.uncertainty_sd ?? null);
-        setConfidence(data.prediction.confidence_level ?? null);
         if (data.odc_plot) {
           setOdcPlot(data.odc_plot);
         }
