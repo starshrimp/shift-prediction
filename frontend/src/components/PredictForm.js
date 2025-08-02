@@ -2,6 +2,13 @@ import React, { useState } from 'react';
 import { Box, Container, Typography, TextField, Button, IconButton, Paper, Alert, Divider, Grid } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails
+} from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+
 import Plot from 'react-plotly.js';
 
 function PredictForm() {
@@ -112,6 +119,22 @@ function PredictForm() {
           The model is most accurate when SpO₂ <strong>&lt;92.5% or &lt;95%</strong>. Predictions for <strong>&gt;95%</strong> may not be equally reliable. <br />
           
         </Typography>
+        <Accordion sx={{ my: 2 }}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="subtitle1"><strong>What is “Shift” and why Does It Matter?</strong></Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Typography variant="body2">
+              “Shift” refers to how far the patient’s oxyhaemoglobin dissociation curve (ODC) is displaced from the reference curve.
+              A rightward shift typically indicates impaired oxygen uptake.
+              <br /><br />
+              This tool uses your SpO₂–PiO₂ measurements to estimate that shift. A higher shift value often corresponds to more severe gas exchange impairment.
+              <br /><br />
+              The model also returns an uncertainty estimate (± SD). Lower SD values mean higher confidence in the prediction.
+            </Typography>
+          </AccordionDetails>
+        </Accordion>
+
         {/* Warning for high SpO₂ */}
         {spo2High && (
           <Alert severity="warning" sx={{ mb: 2 }}>
