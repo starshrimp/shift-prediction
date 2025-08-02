@@ -8,6 +8,8 @@ import {
   AccordionDetails
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Plot from 'react-plotly.js';
+import { spo2OutOfRange, pio2OutOfRange } from "../utils/validation";
 
 import Plot from 'react-plotly.js';
 
@@ -30,6 +32,15 @@ function PredictForm() {
     updated[index][field] = value;
     setDatapoints(updated);
   };
+
+  const hasInvalidInputs = datapoints.some(
+    (dp) =>
+      dp.pio2 === '' ||
+      dp.spo2 === '' ||
+      spo2OutOfRange(dp.spo2) ||
+      pio2OutOfRange(dp.pio2)
+  );
+
 
   const addDatapoint = () => {
     if (datapoints.length < 5) {
@@ -75,9 +86,7 @@ function PredictForm() {
     e.preventDefault();
     setSubmitted(true);
     setPrediction(null);
-    setUncertainty(null);
     setError(null);
-    setConfidence(null);
 
     const payload = {
       inputs: datapoints.map(dp => [parseFloat(dp.pio2), parseFloat(dp.spo2)])
@@ -145,7 +154,9 @@ function PredictForm() {
         <Box sx={{ my: 3 }} />
         <form onSubmit={handleSubmit}>
           {datapoints.map((dp, index) => (
+
             <Grid container spacing={1} key={index} alignItems="center" sx={{ mb: 1, flexWrap: 'nowrap' }}>
+
               <Grid item xs={6} sm={5}>
                 <TextField
                   label="Inspired O₂ (kPa)"
@@ -154,6 +165,28 @@ function PredictForm() {
                   onChange={(e) => handleInputChange(index, 'pio2', e.target.value)}
                   required
                   fullWidth
+                  error={pio2OutOfRange(dp.pio2)}
+                  helperText={
+                    pio2OutOfRange(dp.pio2)
+                      ? "Inspired O₂ must be between 13 and 30 kPa"
+                      : " "
+                  }
+                  slotProps={{
+                    step: 0.1,
+                    min: 13,
+                    max: 30,
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      height: 56,
+                    },
+                    '& .MuiFormHelperText-root': {
+                      whiteSpace: 'normal',
+                      lineHeight: 1.25,
+                      minHeight: '2.5em',
+                      mt: 0.5,
+                    }
+                  }}
                 />
               </Grid>
               <Grid item xs={6} sm={5}>
@@ -164,6 +197,28 @@ function PredictForm() {
                   onChange={(e) => handleInputChange(index, 'spo2', e.target.value)}
                   required
                   fullWidth
+                  error={spo2OutOfRange(dp.spo2)}
+                  helperText={
+                    spo2OutOfRange(dp.spo2)
+                      ? "SpO₂ must be between 80 and 100%"
+                      : " "
+                  }
+                  slotProps={{
+                    step: 0.1,
+                    min: 80,
+                    max: 100,
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      height: 56,
+                    },
+                    '& .MuiFormHelperText-root': {
+                      whiteSpace: 'normal',
+                      lineHeight: 1.25,
+                      minHeight: '2.5em',
+                      mt: 0.5,
+                    }
+                  }}
                 />
               </Grid>
               <Grid item xs={2} sm={2}>
