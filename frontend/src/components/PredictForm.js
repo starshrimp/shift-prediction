@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Container, Typography, TextField, Button, IconButton, Paper, Alert, Divider, Grid } from '@mui/material';
+import {  Accordion, AccordionSummary, AccordionDetailsBox, Container, Typography, TextField, Button, IconButton, Paper, Alert, Divider, Grid } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import {
@@ -10,8 +10,6 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Plot from 'react-plotly.js';
 import { spo2OutOfRange, pio2OutOfRange } from "../utils/validation";
-
-import Plot from 'react-plotly.js';
 
 function PredictForm() {
   const [datapoints, setDatapoints] = useState([{ pio2: '', spo2: '' }]);
