@@ -41,6 +41,16 @@ function PredictForm() {
     setDatapoints((prev) => prev.filter((_, i) => i !== indexToRemove));
   };
 
+  // Validation function for all datapoints
+  const allInputsValid = datapoints.every(dp => {
+    const pio2 = parseFloat(dp.pio2);
+    const spo2 = parseFloat(dp.spo2);
+    return (
+      !isNaN(pio2) && pio2 >= 13 && pio2 <= 53 &&
+      !isNaN(spo2) && spo2 >= 72 && spo2 <= 99.9
+    );
+  });
+
   React.useEffect(() => {
     let warning = '';
     for (let i = 0; i < datapoints.length; i++) {
@@ -119,21 +129,6 @@ function PredictForm() {
           The model is most accurate when SpO₂ <strong>&lt;92.5% or &lt;95%</strong>. Predictions for <strong>&gt;95%</strong> may not be equally reliable. <br />
           
         </Typography>
-        <Accordion sx={{ my: 2 }}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="subtitle1"><strong>What is “Shift” and why Does It Matter?</strong></Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography variant="body2">
-              “Shift” refers to how far the patient’s oxyhaemoglobin dissociation curve (ODC) is displaced from the reference curve.
-              A rightward shift typically indicates impaired oxygen uptake.
-              <br /><br />
-              This tool uses your SpO₂–PiO₂ measurements to estimate that shift. A higher shift value often corresponds to more severe gas exchange impairment.
-              <br /><br />
-              The model also returns an uncertainty estimate (± SD). Lower SD values mean higher confidence in the prediction.
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
 
         {/* Warning for high SpO₂ */}
         {spo2High && (
@@ -199,7 +194,12 @@ function PredictForm() {
             Recommended: <strong>1–3 datapoints</strong> for best results.
           </Alert>
 
-          <Button type="submit" variant="contained" fullWidth>
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            disabled={!allInputsValid}
+          >
             Submit
           </Button>
         </form>
@@ -210,18 +210,12 @@ function PredictForm() {
           <>
             <Divider sx={{ my: 2 }} />
             <Typography variant="h6" gutterBottom>
-              Predicted Shifts
+              Predicted Shift
             </Typography>
             {prediction.map((result, index) => (
               <Box key={index} sx={{ mb: 1 }}>
                 <Typography>
-                  <strong>Point {index + 1}:</strong> {result.prediction} (± {result.uncertainty_sd})
-                </Typography>
-                <Typography variant="body2" sx={{ ml: 2 }}>
-                  Confidence:
-                  {result.confidence_level === 'high' && <span style={{ color: 'green' }}> 🟢 High</span>}
-                  {result.confidence_level === 'moderate' && <span style={{ color: 'orange' }}> 🟡 Moderate</span>}
-                  {result.confidence_level === 'low' && <span style={{ color: 'red' }}> 🔴 Low</span>}
+                  {Number(result.prediction).toFixed(2)} (± {Number(result.uncertainty_sd).toFixed(2)})
                 </Typography>
               </Box>
             ))}
@@ -292,6 +286,58 @@ function PredictForm() {
             </Box>
           </>
         )}
+                <Accordion sx={{ my: 2 }}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="subtitle1"><strong>What is “Shift” and why Does It Matter?</strong></Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Typography variant="body2">
+              “Shift” refers to how far the patient’s oxyhaemoglobin dissociation curve (ODC) is displaced from the reference curve.
+              A rightward shift typically indicates impaired oxygen uptake.
+              <br /><br />
+              This tool uses your SpO₂–PiO₂ measurements to estimate that shift. A higher shift value often corresponds to more severe gas exchange impairment.
+              <br /><br />
+              The model also returns an uncertainty estimate (± SD). Lower SD values mean higher confidence in the prediction.
+            </Typography>
+          </AccordionDetails>
+        </Accordion>
+
+        <Accordion sx={{ my: 2 }}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="subtitle1"><strong>Model Limitations</strong></Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Typography variant="body2">
+              This tool uses a machine learning model trained on paired SpO₂–PiO₂ data from preterm infants to estimate the shift in the oxyhaemoglobin dissociation curve (ODC). While designed for bedside use, the following limitations should be kept in mind:
+              <ul>
+                <li>The model was developed from data on <strong>219 preterm infants</strong>. Performance outside this group (e.g. term infants, adults) is unknown.</li>
+                <li>Predictions are most accurate with <strong>SpO₂ values below ca. 92% to and 95%</strong>. Points above 95% contribute less information and may reduce model accuracy.</li>
+                <li>In <strong>very severely impaired infants</strong> (e.g. high shunt, extreme right shift), the model may <strong>overestimate the shift</strong>, particularly when using only 1–2 datapoints.</li>
+                <li>Reliable input is essential. Ensure that SpO₂ and PiO₂ values are stable and artifact-free before entering.</li>
+                <li>The tool assumes normal haemoglobin–oxygen binding. Hemoglobinopathies or altered Hb levels may affect accuracy.</li>
+                <li>Shift prediction is intended as a <strong>decision support tool</strong>, not a diagnostic output.</li>
+                <li>An uncertainty value (± SD) is provided with each result to reflect confidence in the prediction.</li>
+              </ul>
+            </Typography>
+          </AccordionDetails>
+        </Accordion>
+        <Accordion sx={{ my: 2 }}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="subtitle1"><strong>Data Privacy</strong></Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Typography variant="body2">
+              Your data is <strong>not stored, logged, or transmitted</strong> beyond the scope of the current prediction session.
+              <ul>
+                <li>All data entered is processed <strong>in memory only</strong> and discarded after the result is returned.</li>
+                <li>No data is saved on the server, in cookies, or in browser storage.</li>
+                <li>No patient-identifiable information is used or required.</li>
+                <li>This tool is intended for temporary, local use — suitable for bedside or teaching purposes.</li>
+              </ul>
+            </Typography>
+          </AccordionDetails>
+        </Accordion>
+
       </Paper>
     </Container>
   );
