@@ -100,16 +100,18 @@ function PredictForm() {
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>
       <Paper elevation={3} sx={{ p: 3 }}>
-        <Typography variant="h5" gutterBottom>ODC Shift Prediction</Typography>
+        <Typography variant="h4" gutterBottom>ODC Shift Prediction</Typography>
         <Typography variant="body2">
           This tool helps you estimate the shift in the oxyhaemoglobin dissociation curve (ODC) using your measured SpO₂ and inspired O₂ values. Enter up to 5 datapoints for analysis.
         </Typography>
 
-        {/* Info about SpO₂ performance */}
-        <Alert severity="info" sx={{ mb: 2 }}>
-          Best performance is with <strong>SpO₂ &lt;92.5%</strong> or <strong>&lt;95%</strong>. 
-          Performance for datapoints <strong>&gt;95%</strong> is not so good.
-        </Alert>
+        <Typography variant="h6" gutterBottom>How to Use This Tool</Typography>
+        <Typography variant="body2">
+          Enter 1 to 5 pairs of oxygen saturation (SpO₂) and inspired O₂ pressure (PiO₂). <br />
+          The tool predicts the rightward shift of the ODC, helping assess gas exchange in preterm infants. Outputs include the predicted shift and a confidence estimate. <br />
+          The model is most accurate when SpO₂ <strong>&lt;92.5% or &lt;95%</strong>. Predictions for <strong>&gt;95%</strong> may not be equally reliable. <br />
+          
+        </Typography>
         {/* Warning for high SpO₂ */}
         {spo2High && (
           <Alert severity="warning" sx={{ mb: 2 }}>
@@ -122,7 +124,7 @@ function PredictForm() {
             {inputWarning}
           </Alert>
         )}
-
+        <Box sx={{ my: 3 }} />
         <form onSubmit={handleSubmit}>
           {datapoints.map((dp, index) => (
             <Grid container spacing={1} key={index} alignItems="center" sx={{ mb: 1, flexWrap: 'nowrap' }}>
