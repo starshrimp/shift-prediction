@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {  Accordion, AccordionSummary, AccordionDetailsBox, Container, Typography, TextField, Button, IconButton, Paper, Alert, Divider, Grid } from '@mui/material';
+import {  Accordion, AccordionSummary, AccordionDetails, Box, Container, Typography, TextField, Button, IconButton, Paper, Alert, Divider, Grid } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
