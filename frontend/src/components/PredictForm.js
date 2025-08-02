@@ -2,11 +2,6 @@ import React, { useState } from 'react';
 import {  Accordion, AccordionSummary, AccordionDetailsBox, Container, Typography, TextField, Button, IconButton, Paper, Alert, Divider, Grid } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import {
-  Accordion,
-  AccordionSummary,
-  AccordionDetails
-} from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Plot from 'react-plotly.js';
 import { spo2OutOfRange, pio2OutOfRange } from "../utils/validation";
