@@ -8,11 +8,8 @@ import { spo2OutOfRange, pio2OutOfRange } from "../utils/validation";
 
 function PredictForm() {
   const [datapoints, setDatapoints] = useState([{ pio2: '', spo2: '' }]);
-  const [submitted, setSubmitted] = useState(false);
   const [prediction, setPrediction] = useState(null);
-  const [uncertainty, setUncertainty] = useState(null);
   const [error, setError] = useState(null);
-  const [confidence, setConfidence] = useState(null);
   const [odcPlot, setOdcPlot] = useState(null);
   const isMobile = useMediaQuery('(max-width:600px)');
   const [inputWarning, setInputWarning] = useState('');
@@ -25,15 +22,6 @@ function PredictForm() {
     updated[index][field] = value;
     setDatapoints(updated);
   };
-
-  const hasInvalidInputs = datapoints.some(
-    (dp) =>
-      dp.pio2 === '' ||
-      dp.spo2 === '' ||
-      spo2OutOfRange(dp.spo2) ||
-      pio2OutOfRange(dp.pio2)
-  );
-
 
   const addDatapoint = () => {
     if (datapoints.length < 5) {
@@ -77,7 +65,6 @@ function PredictForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
     setPrediction(null);
     setError(null);
 
@@ -99,12 +86,8 @@ function PredictForm() {
         setError(`Server error: ${data.error}`);
       } else if (Array.isArray(data.prediction)) {
         setPrediction(data.prediction);
-        setUncertainty(null);
-        setConfidence(null);
       } else if (typeof data.prediction === 'object') {
         setPrediction([data.prediction]);
-        setUncertainty(data.prediction.uncertainty_sd ?? null);
-        setConfidence(data.prediction.confidence_level ?? null);
         if (data.odc_plot) {
           setOdcPlot(data.odc_plot);
         }
