@@ -17,7 +17,7 @@ const DatapointInput = ({ index, dp, handleInputChange, removeDatapoint, canRemo
             inputMode: 'decimal',
             pattern: '[0-9]*\\.?[0-9]*',
             min: 13,
-            max: 30,
+            max: 53,
             step: 0.1,
           }
         }}
