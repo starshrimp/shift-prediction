@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.js": "/shift-prediction/static/js/main.de6484ce.js",
-    "index.html": "/shift-prediction/index.html",
-    "main.de6484ce.js.map": "/shift-prediction/static/js/main.de6484ce.js.map"
+    "main.js": "/static/js/main.7e611286.js",
+    "index.html": "/index.html",
+    "main.7e611286.js.map": "/static/js/main.7e611286.js.map"
   },
   "entrypoints": [
-    "static/js/main.de6484ce.js"
+    "static/js/main.7e611286.js"
   ]
 }
