@@ -3,7 +3,7 @@ import { Box, Container, Typography, Button, IconButton, Paper, Alert, Divider }
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import InfoAccordions from './InfoAccordions';
 import DatapointInput from './DatapointInput';
-import OdcPlot from './OdcPlot';
+import OdcPlot from './OdcPlot.jsx';
 import { useDatapoints } from '../hooks/useDatapoints';
 
 
