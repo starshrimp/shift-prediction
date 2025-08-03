@@ -6,6 +6,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Plot from 'react-plotly.js';
 import { spo2OutOfRange, pio2OutOfRange } from "../utils/validation";
 import InfoAccordions from './InfoAccordions';
+import DatapointInput from './DatapointInput';
 
 function PredictForm() {
   const [datapoints, setDatapoints] = useState([{ pio2: '', spo2: '' }]);
@@ -131,107 +132,15 @@ function PredictForm() {
         <Box sx={{ my: 3 }} />
         <form onSubmit={handleSubmit}>
           {datapoints.map((dp, index) => (
-
-            <Grid container spacing={1} key={index} alignItems="center" sx={{ mb: 1, flexWrap: 'nowrap' }}>
-
-              <Grid item xs={6} sm={5}>
-                <TextField
-                  label="Inspired O₂ (kPa)"
-                  type="number"
-                  value={dp.pio2}
-                  onChange={(e) => handleInputChange(index, 'pio2', e.target.value)}
-                  required
-                  fullWidth
-                  error={pio2OutOfRange(dp.pio2)}
-                  helperText={
-                    pio2OutOfRange(dp.pio2)
-                      ? "Inspired O₂ must be between 13 and 30 kPa"
-                      : " "
-                  }
-                  slotProps={{
-                    input: {
-                      inputMode: 'decimal',
-                      pattern: '[0-9]*\\.?[0-9]*',
-                      min: 13,
-                      max: 30,
-                      step: 0.1,
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if (['e', 'E', '+', '-'].includes(e.key)) {
-                      e.preventDefault();
-                    }
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      height: 56,
-                    },
-                    '& .MuiFormHelperText-root': {
-                      whiteSpace: 'normal',
-                      lineHeight: 1.25,
-                      minHeight: '2.5em',
-                      mt: 0.5,
-                    }
-                  }}
-                />
-
-              </Grid>
-              <Grid item xs={6} sm={5}>
-                <TextField
-                  label="SpO₂ (%)"
-                  type="number"
-                  value={dp.spo2}
-                  onChange={(e) => handleInputChange(index, 'spo2', e.target.value)}
-                  required
-                  fullWidth
-                  error={spo2OutOfRange(dp.spo2)}
-                  helperText={
-                    spo2OutOfRange(dp.spo2)
-                      ? "SpO₂ must be between 80 and 100%"
-                      : " "
-                  }
-                  slotProps={{
-                    input: {
-                      inputMode: 'decimal',
-                      pattern: '[0-9]*\\.?[0-9]*',
-                      min: 80,
-                      max: 100,
-                      step: 0.1,
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if (['e', 'E', '+', '-'].includes(e.key)) {
-                      e.preventDefault();
-                    }
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      height: 56,
-                    },
-                    '& .MuiFormHelperText-root': {
-                      whiteSpace: 'normal',
-                      lineHeight: 1.25,
-                      minHeight: '2.5em',
-                      mt: 0.5,
-                    }
-                  }}
-                />
-
-              </Grid>
-              <Grid item xs={2} sm={2}>
-                {datapoints.length > 1 && (
-                  <Button
-                    color="error"
-                    onClick={() => removeDatapoint(index)}
-                    sx={{ minWidth: 0, visibility: index === 0 ? 'hidden' : 'visible' }}
-                  >
-                    X
-                  </Button>
-                )}
-              </Grid>
-            </Grid>
+            <DatapointInput
+              key={index}
+              index={index}
+              dp={dp}
+              handleInputChange={handleInputChange}
+              removeDatapoint={removeDatapoint}
+              canRemove={datapoints.length > 1}
+            />
           ))}
-
           <Box display="flex" justifyContent="center" mb={2}>
             <IconButton
               color="primary"
