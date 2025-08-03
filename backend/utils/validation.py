@@ -5,10 +5,10 @@ def validate_input_row(row):
     except (KeyError, TypeError, ValueError):
         return False, "All fields must be valid numbers."
 
-    if pio2 < 13 or pio2 > 30:
-        return False, "Inspired O₂ must be between 13 and 30 kPa."
+    if pio2 < 13 or pio2 > 53:
+        return False, "Inspired O₂ must be between 13 and 53 kPa."
 
-    if spo2 < 80 or spo2 > 100:
-        return False, "SpO₂ must be between 80% and 100%."
+    if spo2 < 72 or spo2 > 99.9:
+        return False, "SpO₂ must be between 72 and 99.9%."
 
     return True, None
