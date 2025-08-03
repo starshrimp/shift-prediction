@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Container, Typography, Button, IconButton, Paper, Alert, Divider } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import InfoAccordions from './InfoAccordions';
 import DatapointInput from './DatapointInput';
 import OdcPlot from './OdcPlot';
@@ -13,7 +12,6 @@ function PredictForm() {
   const [prediction, setPrediction] = useState(null);
   const [error, setError] = useState(null);
   const [odcPlot, setOdcPlot] = useState(null);
-  const isMobile = useMediaQuery('(max-width:600px)');
   const {
     datapoints,
     addDatapoint,
