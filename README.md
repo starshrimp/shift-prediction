@@ -9,7 +9,7 @@ A web-based tool for predicting the rightward shift in the oxyhaemoglobin dissoc
 **No installation required!**  
 Simply visit the website:
 
-[https://your-deployed-url.com](https://your-deployed-url.com)
+[https://odcshift.sarahrebeccameyer.com/](https://odcshift.sarahrebeccameyer.com/)
 
 ---
 
