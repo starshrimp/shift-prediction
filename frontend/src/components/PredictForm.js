@@ -148,9 +148,18 @@ function PredictForm() {
                       : " "
                   }
                   slotProps={{
-                    step: 0.1,
-                    min: 13,
-                    max: 30,
+                    input: {
+                      inputMode: 'decimal',
+                      pattern: '[0-9]*\\.?[0-9]*',
+                      min: 13,
+                      max: 30,
+                      step: 0.1,
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (['e', 'E', '+', '-'].includes(e.key)) {
+                      e.preventDefault();
+                    }
                   }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
@@ -164,6 +173,7 @@ function PredictForm() {
                     }
                   }}
                 />
+
               </Grid>
               <Grid item xs={6} sm={5}>
                 <TextField
@@ -180,9 +190,18 @@ function PredictForm() {
                       : " "
                   }
                   slotProps={{
-                    step: 0.1,
-                    min: 80,
-                    max: 100,
+                    input: {
+                      inputMode: 'decimal',
+                      pattern: '[0-9]*\\.?[0-9]*',
+                      min: 80,
+                      max: 100,
+                      step: 0.1,
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (['e', 'E', '+', '-'].includes(e.key)) {
+                      e.preventDefault();
+                    }
                   }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
@@ -196,6 +215,7 @@ function PredictForm() {
                     }
                   }}
                 />
+
               </Grid>
               <Grid item xs={2} sm={2}>
                 {datapoints.length > 1 && (
@@ -342,7 +362,7 @@ function PredictForm() {
               This tool uses a machine learning model trained on paired SpO₂–PiO₂ data from preterm infants to estimate the shift in the oxyhaemoglobin dissociation curve (ODC). While designed for bedside use, the following limitations should be kept in mind:
               <ul>
                 <li>The model was developed from data on <strong>219 preterm infants</strong>. Performance outside this group (e.g. term infants, adults) is unknown.</li>
-                <li>Predictions are most accurate with <strong>SpO₂ values below ca. 92% to and 95%</strong>. Points above 95% contribute less information and may reduce model accuracy.</li>
+                <li>Predictions are most accurate with <strong>SpO₂ values below ca. 92%  and 95%</strong>. Points above 95% contribute less information and may reduce model accuracy.</li>
                 <li>In <strong>very severely impaired infants</strong> (e.g. high shunt, extreme right shift), the model may <strong>overestimate the shift</strong>, particularly when using only 1–2 datapoints.</li>
                 <li>Reliable input is essential. Ensure that SpO₂ and PiO₂ values are stable and artifact-free before entering.</li>
                 <li>The tool assumes normal haemoglobin–oxygen binding. Hemoglobinopathies or altered Hb levels may affect accuracy.</li>
