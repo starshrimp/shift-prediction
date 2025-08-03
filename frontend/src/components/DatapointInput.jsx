@@ -1,7 +1,5 @@
 import React from 'react';
 import { TextField, Grid, Button } from '@mui/material';
-import { spo2OutOfRange, pio2OutOfRange } from '../utils/validation';
-
 const DatapointInput = ({ index, dp, handleInputChange, removeDatapoint, canRemove }) => (
   <Grid container spacing={1} alignItems="center" sx={{ mb: 1, flexWrap: 'nowrap' }}>
     <Grid item xs={6} sm={5}>
