@@ -1,70 +1,29 @@
 import React, { useState } from 'react';
-import {  Accordion, AccordionSummary, AccordionDetails, Box, Container, Typography, TextField, Button, IconButton, Paper, Alert, Divider, Grid } from '@mui/material';
+import { Box, Container, Typography, Button, IconButton, Paper, Alert, Divider } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import Plot from 'react-plotly.js';
-import { spo2OutOfRange, pio2OutOfRange } from "../utils/validation";
 import InfoAccordions from './InfoAccordions';
 import DatapointInput from './DatapointInput';
 import OdcPlot from './OdcPlot';
+import { useDatapoints } from '../hooks/useDatapoints';
+
 
 
 function PredictForm() {
-  const [datapoints, setDatapoints] = useState([{ pio2: '', spo2: '' }]);
   const [prediction, setPrediction] = useState(null);
   const [error, setError] = useState(null);
   const [odcPlot, setOdcPlot] = useState(null);
   const isMobile = useMediaQuery('(max-width:600px)');
-  const [inputWarning, setInputWarning] = useState('');
-
-  // Check for SpO₂ > 95%
+  const {
+    datapoints,
+    addDatapoint,
+    removeDatapoint,
+    handleInputChange,
+    allInputsValid,
+    inputWarning
+  } = useDatapoints();
   const spo2High = datapoints.some(dp => parseFloat(dp.spo2) > 95);
-
-  const handleInputChange = (index, field, value) => {
-    const updated = [...datapoints];
-    updated[index][field] = value;
-    setDatapoints(updated);
-  };
-
-  const addDatapoint = () => {
-    if (datapoints.length < 5) {
-      setDatapoints([...datapoints, { pio2: '', spo2: '' }]);
-    }
-  };
-
-  const removeDatapoint = (indexToRemove) => {
-    setDatapoints((prev) => prev.filter((_, i) => i !== indexToRemove));
-  };
-
-  // Validation function for all datapoints
-  const allInputsValid = datapoints.every(dp => {
-    const pio2 = parseFloat(dp.pio2);
-    const spo2 = parseFloat(dp.spo2);
-    return (
-      !isNaN(pio2) && pio2 >= 13 && pio2 <= 53 &&
-      !isNaN(spo2) && spo2 >= 72 && spo2 <= 99.9
-    );
-  });
-
-  React.useEffect(() => {
-    let warning = '';
-    for (let i = 0; i < datapoints.length; i++) {
-      const pio2 = parseFloat(datapoints[i].pio2);
-      const spo2 = parseFloat(datapoints[i].spo2);
-
-      if (!isNaN(pio2) && (pio2 < 13 || pio2 > 53)) {
-        warning = "Inspired O₂ must be between 13–53 kPa. This ensures reliable prediction within trained model range. Please correct your entry.";
-        break;
-      }
-      if (!isNaN(spo2) && (spo2 < 72 || spo2 > 99.9)) {
-        warning = "Oxygen saturation must be between 72–99.9%. This ensures reliable prediction within trained model range. Please correct your entry.";
-        break;
-      }
-    }
-    setInputWarning(warning);
-  }, [datapoints]);
-
+  
   
 
   const handleSubmit = async (e) => {
@@ -116,7 +75,6 @@ function PredictForm() {
           Enter 1 to 5 pairs of oxygen saturation (SpO₂) and inspired O₂ pressure (PiO₂). <br />
           The tool predicts the rightward shift of the ODC, helping assess gas exchange in preterm infants. Outputs include the predicted shift and a confidence estimate. <br />
           The model is most accurate when SpO₂ <strong>&lt;92.5% or &lt;95%</strong>. Predictions for <strong>&gt;95%</strong> may not be equally reliable. <br />
-          
         </Typography>
 
         {/* Warning for high SpO₂ */}
