@@ -47,10 +47,10 @@ def predict():
             except (ValueError, TypeError):
                 return jsonify({"error": f"Non-numeric input at row {idx + 1}"}), 400
 
-            if not (13 <= pio2 <= 30):
-                return jsonify({"error": f"Inspired O₂ at row {idx + 1} must be between 13 and 30 kPa"}), 400
-            if not (80 <= spo2 <= 100):
-                return jsonify({"error": f"SpO₂ at row {idx + 1} must be between 80% and 100%"}), 400
+            if not (13 <= pio2 <= 53):
+                return jsonify({"error": f"Inspired O₂ at row {idx + 1} must be between 13 and 53 kPa"}), 400
+            if not (72 <= spo2 <= 99.9):
+                return jsonify({"error": f"SpO₂ at row {idx + 1} must be between 72% and 99.9%"}), 400
 
 
         # --- Load ODC + reference P50 ---
